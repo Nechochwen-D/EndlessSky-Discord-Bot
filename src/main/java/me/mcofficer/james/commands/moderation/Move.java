@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.requests.RestAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -17,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Move extends Command {
+
+    private static final Logger log = LoggerFactory.getLogger(Move.class);
 
     public Move() {
         name = "move";
@@ -50,13 +53,13 @@ public class Move extends Command {
                     return;
                 LinkedList<String> toMove = new LinkedList<>();
                 for (Message m : toDelete) {
-                    Member chatter = m.getMember();
-                    String what = m.getContentStripped().trim();
-                    if (what.isEmpty())
+                    String authorName = Optional.ofNullable(m.getMember()).map(Member::getEffectiveName).orElse("unknown author");
+                    String content = m.getContentStripped().trim();
+                    if (content.isEmpty())
                         continue;
                     toMove.addFirst(m.getTimeCreated()
                             .format(DateTimeFormatter.ISO_INSTANT).substring(11, 19)
-                            + "Z " + chatter.getEffectiveName() + ": " + what + "\n"
+                            + "Z " + authorName + ": " + content + "\n"
                     );
                 }
                 // Remove the messages from the original channel and log the move.
@@ -67,8 +70,7 @@ public class Move extends Command {
                         .forEach(chunk -> {
                             try {
                                 event.getTextChannel().deleteMessages(chunk).complete();
-                            }
-                            catch (IllegalArgumentException e) {
+                            } catch (IllegalArgumentException e) {
                                 event.reply("Encountered an error while moving messages: " + e.getMessage());
                             }
                         });
@@ -91,7 +93,11 @@ public class Move extends Command {
                         " to " + dest.getAsMention() + ", ordered by `" +
                         event.getMember().getEffectiveName() + "`.";
                 Util.log(event.getGuild(), report);
-            });
+            }).exceptionally(e -> {
+                        log.error("Failed to to move messages", e);
+                        return null;
+                    }
+            );
         } else
             event.reply(Util.getRandomDeniedMessage());
     }
