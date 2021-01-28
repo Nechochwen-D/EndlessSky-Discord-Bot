@@ -14,8 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 public class Move extends Command {
 
@@ -62,26 +61,23 @@ public class Move extends Command {
                             + "Z " + authorName + ": " + content + "\n"
                     );
                 }
-                // Remove the messages from the original channel and log the move.
-                AtomicInteger counter = new AtomicInteger();
-                toDelete.stream()
-                        .collect(Collectors.groupingBy(x -> counter.getAndIncrement() / 100))
-                        .values()
-                        .forEach(chunk -> {
-                            try {
-                                event.getTextChannel().deleteMessages(chunk).complete();
-                            } catch (IllegalArgumentException e) {
-                                event.reply("Encountered an error while moving messages: " + e.getMessage());
-                            }
-                        });
 
-                EmbedBuilder log = new EmbedBuilder();
-                log.setDescription(dest.getAsMention());
-                log.setThumbnail("https://cdn.discordapp.com/emojis/344684586904584202.png");
-                log.appendDescription("\n(" + toMove.size() + " messages await)");
+                // Remove the messages from the original channel
+                for (CompletableFuture<Void> future : event.getChannel().purgeMessages(toDelete))
+                {
+                    future.exceptionally(t -> {
+                        t.printStackTrace();
+                        return null;
+                    });
+                }
+
+                EmbedBuilder replyEmbed = new EmbedBuilder();
+                replyEmbed.setDescription(dest.getAsMention());
+                replyEmbed.setThumbnail("https://cdn.discordapp.com/emojis/344684586904584202.png");
+                replyEmbed.appendDescription("\n(" + toMove.size() + " messages await)");
                 if (toDelete.size() - toMove.size() > 0)
-                    log.appendDescription("\n(Some embeds were eaten)");
-                event.getTextChannel().sendMessage(log.build()).queue();
+                    replyEmbed.appendDescription("\n(Some embeds were eaten)");
+                event.getTextChannel().sendMessage(replyEmbed.build()).queue();
 
                 // Transport the message content to the new channel.
                 if (!toMove.isEmpty())
