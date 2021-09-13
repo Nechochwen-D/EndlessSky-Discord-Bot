@@ -8,6 +8,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Info extends Command {
 
     private String commit;
@@ -40,7 +43,9 @@ public class Info extends Command {
     }
 
     private void getInfo(String githubToken) {
-        JSONObject latest = new JSONArray(Util.getContentFromUrl("https://api.github.com/repos/EndlessSkyCommunity/EndlessSky-Discord-Bot/commits?access_token=" + githubToken))
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "token "+ githubToken);
+        JSONObject latest = new JSONArray(Util.getContentFromUrl("https://api.github.com/repos/EndlessSkyCommunity/EndlessSky-Discord-Bot/commits", headers))
                 .getJSONObject(0);
         commit = String.format("[%s](%s): %s", latest.getString("sha").substring(0, 7), latest.getString("html_url"),
                 latest.getJSONObject("commit").getString("message"));

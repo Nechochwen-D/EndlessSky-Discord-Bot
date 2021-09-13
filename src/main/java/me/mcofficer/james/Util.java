@@ -63,10 +63,21 @@ public class Util {
      * @return
      */
     @CheckReturnValue
-    public static String getContentFromUrl(String url) {
+    public static String getContentFromUrl(String url) { {
+        return getContentFromUrl(url, new HashMap<>());
+    }}
+
+    /** Fetches the content reached at the URL as String. If the response is invalid, returns empty String.
+     * @param url
+     * @param headers
+     * @return
+     */
+    @CheckReturnValue
+    public static String getContentFromUrl(String url, Map<String, String> headers) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestProperty("User-Agent", "MarioB(r)owser4.2");
+            headers.forEach(connection::setRequestProperty);
             connection.connect();
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
@@ -203,9 +214,10 @@ public class Util {
     }
 
     private static void fetchGameDataRecursive(String githubToken, File dataFolder, String repoPath) {
-        JSONArray json = new JSONArray(Util.getContentFromUrl(String.format(
-                "https://api.github.com/repos/endless-sky/endless-sky/contents%s?ref=master&access_token=%s",
-                repoPath, githubToken)));
+        String url = String.format("https://api.github.com/repos/endless-sky/endless-sky/contents%s?ref=master", repoPath);
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "token "+ githubToken);
+        JSONArray json = new JSONArray(Util.getContentFromUrl(url, headers));
         for (Object o : json) {
             try {
                 JSONObject j = (JSONObject) o;
@@ -230,12 +242,14 @@ public class Util {
     }
 
     /** Iterates recursively through a directory of the GitHub API and compiles a List of image paths. Only for use in {@link #get1xImagePaths(String)}.
-     * @param path
+     * @param url
      * @param githubToken
      * @return
      */
-    private static ArrayList<String> checkImageDir(String path, String githubToken) {
-        JSONArray json = new JSONArray(Util.getContentFromUrl(path + "&access_token=" + githubToken));
+    private static ArrayList<String> checkImageDir(String url, String githubToken) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "token "+ githubToken);
+        JSONArray json = new JSONArray(Util.getContentFromUrl(url, headers));
         ArrayList<String> arrayList = new ArrayList<>();
         for (Object o : json) {
             JSONObject j = (JSONObject) o;
