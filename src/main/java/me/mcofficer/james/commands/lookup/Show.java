@@ -43,7 +43,6 @@ public class Show extends ShowCommand {
         return new MessageBuilder()
                 .setEmbed(embedBuilder.isEmpty() ? null : embedBuilder.build()) // if no image was found, the embed builder cannot be built
                 .append(Util.sendInChunksReturnLast(event.getTextChannel(), lookups.getNodeAsText(node).split("(?=\n)")))
-                .append("```")
                 .build();
     }
 }
