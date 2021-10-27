@@ -1,8 +1,8 @@
 package me.mcofficer.james.commands.lookup;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.mcofficer.esparser.DataNode;
+import me.mcofficer.james.commands.lookup.ShowCommand;
 import me.mcofficer.james.James;
 import me.mcofficer.james.Util;
 import me.mcofficer.james.tools.Lookups;
@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.List;
 
-public class Lookup extends Command {
+public class Lookup extends ShowCommand {
 
     private final Lookups lookups;
 
@@ -37,20 +37,13 @@ public class Lookup extends Command {
     }
 
     private MessageEmbed createLookupMessage(DataNode node, Guild guild) {
-        String[] lookup = lookups.getLookupByNode(node);
-
-        EmbedBuilder embedBuilder = new EmbedBuilder()
-                .setColor(guild.getSelfMember().getColor());
-
-        if (lookup[0] == null)
-            embedBuilder.appendDescription("Couldn't find an image node!\n\n");
-        else
-            embedBuilder.setImage(lookup[0]);
-
-        if (lookup[1] == null)
+        EmbedBuilder embedBuilder = embedImageByNode(node, guild, lookups, true);
+        String description = lookups.getDescription(node);
+        
+        if (description == null)
             embedBuilder.appendDescription("Couldn't find a description node!");
         else
-            embedBuilder.setDescription(lookup[1]);
+            embedBuilder.setDescription(description);
 
         embedBuilder.appendDescription("\n\n" + lookups.getLinks(node));
 
