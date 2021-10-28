@@ -33,6 +33,12 @@ public class TrackScheduler extends AudioEventAdapter {
         play(queue.poll());
     }
 
+    public AudioTrack remove(int position) {
+        if (position > getQueueSize())
+            return null;
+        return queue.remove(position - 1);
+    }
+
     /**
      * Plays a track immediately. You probably want to use {@link #enqueue(AudioTrack)} instead.
      * @param track
@@ -61,6 +67,10 @@ public class TrackScheduler extends AudioEventAdapter {
     public void stop() {
         player.stopTrack();
         queue.clear();
+    }
+
+    public int getQueueSize() {
+        return queue.size();
     }
 
     public LinkedList<AudioTrack> getQueue() {
