@@ -83,6 +83,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public boolean getLooping() {
         return looping;
+    }
 
     public int getQueueSize() {
         return queue.size();
