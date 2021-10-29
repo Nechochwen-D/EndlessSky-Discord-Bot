@@ -13,10 +13,13 @@ public class TrackScheduler extends AudioEventAdapter {
 
     private final AudioPlayer player;
     private final LinkedList<AudioTrack> queue = new LinkedList<>();
+    
+    private boolean looping;
 
     public TrackScheduler(AudioPlayer player) {
         this.player = player;
         player.addListener(this);
+        looping = false;
     }
 
     /**
@@ -57,8 +60,12 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if(endReason.mayStartNext)
-            skip();
+        if(endReason.mayStartNext) {
+            if (looping)
+                play(track.makeClone());
+            else
+                skip();
+        }
     }
 
     /**
@@ -66,8 +73,16 @@ public class TrackScheduler extends AudioEventAdapter {
      */
     public void stop() {
         player.stopTrack();
+        looping = false;
         queue.clear();
     }
+
+    public void setLooping(boolean loop) {
+        looping = loop;
+    }
+
+    public boolean getLooping() {
+        return looping;
 
     public int getQueueSize() {
         return queue.size();
