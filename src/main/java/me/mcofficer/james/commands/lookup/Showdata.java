@@ -13,26 +13,15 @@ import java.util.List;
 
 public class Showdata extends ShowCommand {
 
-    private final Lookups lookups;
-
     public Showdata(Lookups lookups) {
+        super(lookups);
         name = "showdata";
         help = "Outputs the data associated with <query>.";
         arguments = "<query>";
         category = James.lookup;
-        this.lookups = lookups;
     }
 
-    @Override
-    protected void execute(CommandEvent event) {
-        List<DataNode> matches = lookups.getNodesByString(event.getArgs());
-
-        if (matches.size() < 1)
-            event.reply("Found no matches for `" + event.getArgs() + "`!");
-        else if (matches.size() == 1)
-            Util.sendInChunks(event.getTextChannel(), lookups.getNodeAsText(matches.get(0)).split("(?=\n)"));
-        else
-            Util.displayNodeSearchResults(matches, event, ((message, integer) ->
-                    Util.sendInChunks(event.getTextChannel(), lookups.getNodeAsText(matches.get(integer - 1)).split("(?=\n)"))));
+    protected void reply(DataNode node, CommandEvent event) {
+        Util.sendInChunks(event.getTextChannel(), lookups.getNodeAsText(node).split("(?=\n)"));
     }
 }
