@@ -32,7 +32,7 @@ public class Lookup extends ShowCommand {
         else
             embedBuilder.setDescription(description);
 
-        embedBuilder.appendDescription("\n\n" + lookups.getLinks(node));
+        //embedBuilder.appendDescription("\n\n" + lookups.getLinks(node));
 
         event.reply(embedBuilder.build());
     }
