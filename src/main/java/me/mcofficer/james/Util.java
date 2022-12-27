@@ -214,7 +214,7 @@ public class Util {
     }
 
     private static void fetchGameDataRecursive(String githubToken, File dataFolder, String repoPath) {
-        String url = String.format("https://api.github.com/repos/endless-sky/endless-sky/contents%s?ref=master", repoPath);
+        String url = String.format("https://api.github.com/repos/endless-sky/endless-sky/contents/%s?ref=master", repoPath);
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "token "+ githubToken);
         JSONArray json = new JSONArray(Util.getContentFromUrl(url, headers));
