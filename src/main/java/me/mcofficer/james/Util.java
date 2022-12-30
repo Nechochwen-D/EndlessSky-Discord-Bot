@@ -5,11 +5,14 @@ import com.jagrosh.jdautilities.menu.OrderedMenu;
 import me.mcofficer.esparser.DataNode;
 import me.mcofficer.esparser.Sources;
 import net.dv8tion.jda.api.entities.*;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import okhttp3.OkHttpClient;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -19,7 +22,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -29,6 +31,18 @@ import java.util.function.BiConsumer;
 public class Util {
 
     private static Logger log = LoggerFactory.getLogger(Util.class);
+
+    private static OkHttpClient _client = null;
+
+    /**
+     * @return A shared OkHttpClient.
+     */
+    public static OkHttpClient okHttpClient() {
+        if (_client == null) {
+            _client = new OkHttpClient();
+        }
+        return _client;
+    }
 
     /**
      * Checks a URL for the HTTP status code.
@@ -74,17 +88,12 @@ public class Util {
      */
     @CheckReturnValue
     public static String getContentFromUrl(String url, Map<String, String> headers) {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestProperty("User-Agent", "MarioB(r)owser4.2");
-            headers.forEach(connection::setRequestProperty);
-            connection.connect();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            int cp;
-            while ((cp = reader.read()) != -1)
-                sb.append((char) cp);
-            return sb.toString();
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "MarioB(r)owser4.2");
+        headers.forEach(builder::addHeader);
+        try (Response response = okHttpClient().newCall(builder.build()).execute()) {
+            return response.body().string();
         }
         catch (IOException e) {
             e.printStackTrace();
