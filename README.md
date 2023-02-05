@@ -6,12 +6,15 @@ Meet James, the Discord Bot made specifically for the Endless Sky Server.
 
 ## Installation
 ### Requirements
-- A JDK (Java 11 or better)
+- A JDK (Java 11 or better) or Docker
+
 ### Setup
 1. Clone or fork this repository
 2. Using the Discord API, make a new Bot and save token in `james.properties` (follow [this guide](https://github.com/DV8FromTheWorld/JDA/wiki/3%29-Getting-Started) until "2. Setup JDA Project" to obtain a token)
 3. Acquire a GitHub API Key and save it in `james.properties`
-5. Start James by executing `./gradlew run` (`gradlew.bat run` on windows)
+4. Start James using
+    - ... your JDK: `./gradlew run` (`gradlew.bat run` on windows)
+    - ... Docker: `docker run -v /path/to/your/james.properties:/james.properties ghcr.io/endlessskycommunity/endlesssky-discord-bot:latest`
 
 ## Features
 - Displays portions of the Endless Sky data files (Ships & their variants, Outfits, Sprites/Thumbnails, Missions)
