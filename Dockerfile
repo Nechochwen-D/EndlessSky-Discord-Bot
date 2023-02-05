@@ -1,8 +1,9 @@
 
-FROM adoptopenjdk/openjdk11
-
+FROM eclipse-temurin:17-jdk-alpine as builder
 ADD . /app
 WORKDIR /app
-RUN ./gradlew --no-daemon
+RUN ./gradlew --no-daemon shadowJar
 
-CMD ["java", "-jar", "build/libs/ES-Bot-2.0-SNAPSHOT.jar"]
+FROM eclipse-temurin:17-jre-alpine
+COPY --from=builder /app/build/libs/ES-Bot-2.0-SNAPSHOT-all.jar /bot.jar
+CMD ["java", "-jar", "bot.jar"]
