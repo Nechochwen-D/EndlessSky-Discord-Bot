@@ -14,7 +14,7 @@ Meet James, the Discord Bot made specifically for the Endless Sky Server.
 3. Acquire a GitHub API Key and save it in `james.properties`
 4. Start James using
     - ... your JDK: `./gradlew run` (`gradlew.bat run` on windows)
-    - ... Docker: `docker run -v /path/to/your/james.properties:/james.properties ghcr.io/endlessskycommunity/endlesssky-discord-bot:latest`
+    - ... Docker: `docker run -v /path/to/your/james.properties:/james.properties ghcr.io/endlessskycommunity/endlesssky-discord-bot:latest` (optional: also mount `/data/playlists.json` to preserve custom playlists)
 
 ## Features
 - Displays portions of the Endless Sky data files (Ships & their variants, Outfits, Sprites/Thumbnails, Missions)
